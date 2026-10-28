@@ -1,0 +1,10 @@
+{
+  "event_time": "2026-10-24T09:31:45+05:30",
+  "system": "kubernetes",
+  "pod": "order-service-7d889b94cf-m2q1r",
+  "namespace": "production",
+  "reason": "CrashLoopBackOff",
+  "exit_code": 1,
+  "message": "ConfigurationError: required key 'DB_MAX_IDLE_TIMEOUT_MS' not found in configmap 'order-service-config' (found: 'DB_MAX_IDEL_TIMEOUT_MS'). Process exited with code 1.",
+  "restart_count": 5
+}

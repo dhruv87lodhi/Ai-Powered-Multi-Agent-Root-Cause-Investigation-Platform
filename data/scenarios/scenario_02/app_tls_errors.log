@@ -1,0 +1,2 @@
+2026-10-25 11:16:02.114 ERROR [payment-gateway-service,trace_id=9f8a8123c,span_id=71b9] urllib3.connectionpool - Outbound HTTPS call to https://api.globalpay.com/v1/charge failed: SSLError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1006)
+2026-10-25 11:16:05.892 ERROR [payment-gateway-service,trace_id=102a9947f,span_id=83c1] payment_processor.client - Failed to process card token: upstream TLS handshake failure, aborting request

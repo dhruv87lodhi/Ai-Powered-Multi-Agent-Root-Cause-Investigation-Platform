@@ -1,0 +1,9 @@
+{
+  "metric_name": "http.response.502_bad_gateway_rate",
+  "service": "payment-gateway-service",
+  "timestamp": "2026-10-25T11:17:00+05:30",
+  "value": 89.4,
+  "unit": "percent",
+  "endpoint": "/api/v1/payments/charge",
+  "message": "HTTP 502 Bad Gateway rate surged to 89.4% across 12 pods. Outbound calls to upstream payment gateway timed out or failed SSL negotiation."
+}

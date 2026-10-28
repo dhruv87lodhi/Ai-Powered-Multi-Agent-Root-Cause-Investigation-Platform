@@ -12,7 +12,7 @@
 | `POST` | `/api/incidents` | Create a new incident record | `IncidentCreate` | `201 Created` (`IncidentResponse`) |
 | `GET` | `/api/incidents` | List all incidents | None (optional query params) | `200 OK` (`list[IncidentResponse]`) |
 | `GET` | `/api/incidents/{id}` | Retrieve incident details | None | `200 OK` (`IncidentResponse`) |
-| `POST` | `/api/incidents/{id}/evidence` | Ingest evidence associated with an incident | `EvidenceCreate` (or payload without id) | `201 Created` (`EvidenceResponse`) |
+| `POST` | `/api/incidents/{id}/evidence` | Upload one or multiple evidence files (`.json`, `.jsonl`, `.csv`, `.txt`) | `multipart/form-data` (`files`) | `201 Created` (`EvidenceBatchResponse`) |
 | `GET` | `/api/incidents/{id}/evidence` | List all evidence items for an incident | None | `200 OK` (`list[EvidenceResponse]`) |
 | `POST` | `/api/incidents/{id}/investigate` | Trigger the LangGraph state machine workflow | None | `200 OK` (`InvestigationState`) |
 | `GET` | `/api/incidents/{id}/state` | Inspect current investigation workflow state | None | `200 OK` (`InvestigationState`) |
@@ -24,7 +24,7 @@
 Rather than maintaining a separate or proprietary "benchmark loader" endpoint in backend application code, **all telemetry—including benchmark scenarios (`scenario_01`, `scenario_02`, `scenario_03`)—is ingested exclusively through the standard production REST API endpoints**:
 
 1. **Incident Creation**: Benchmark incidents are submitted via `POST /api/incidents`.
-2. **Evidence Ingestion**: Benchmark telemetry items are submitted via `POST /api/incidents/{id}/evidence` with `"source_type": "BENCHMARK"`.
+2. **Evidence Ingestion**: Benchmark telemetry files are submitted via `POST /api/incidents/{id}/evidence` with `"source_type": "UPLOAD"`.
 3. **Automated Verification**: Pytest suites load test datasets from `data/scenarios/` and verify the complete ingestion and state preparation pipeline through the standard HTTP interface.
 
 This ensures:
@@ -81,27 +81,40 @@ This ensures:
 
 ---
 
-### 4. Ingest Evidence Item
+### 4. Upload Evidence Files
 * **URL**: `POST /api/incidents/{incident_id}/evidence`
+* **Content-Type**: `multipart/form-data`
 * **Status**: `201 Created`
-* **Request Payload**:
+* **Request**: Upload 1 or more files via the `files` form field (supports `.json`, `.jsonl`, `.csv`, `.txt`).
+* **Query Parameters**:
+  * `deduplicate` (bool, default: `true`): Skips files/records matching existing content hashes.
+* **Response Payload**: `EvidenceBatchResponse`
   ```json
   {
-    "evidence_type": "ticket",
-    "source_type": "BENCHMARK",
-    "source_name": "jira",
-    "source_record_id": "JIRA-501",
-    "event_time": "2026-10-24T09:32:00+05:30",
-    "excerpt": "Multiple users reporting timeouts when placing orders during checkout.",
-    "original_ref": "https://jira.company.com/browse/JIRA-501",
-    "reliability_score": 0.9500,
-    "payload": {
-      "reporter": "alice@company.com",
-      "priority": "Highest"
-    }
+    "inserted_count": 3,
+    "skipped_count": 0,
+    "items": [
+      {
+        "evidence_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+        "incident_id": "c1f8a847-a8d2-4b2a-89bc-9937bc38d9b1",
+        "evidence_type": "ticket",
+        "source_type": "UPLOAD",
+        "source_name": "k8s_crashloop.json",
+        "source_record_id": "JIRA-101",
+        "event_time": "2026-10-24T09:32:00+05:30",
+        "ingested_at": "2026-10-24T09:35:40+05:30",
+        "excerpt": "Multiple users reporting timeouts when placing orders during checkout.",
+        "original_ref": "https://jira.company.com/browse/JIRA-101",
+        "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "reliability_score": 0.9500,
+        "payload": {
+          "reporter": "alice@company.com",
+          "priority": "Highest"
+        }
+      }
+    ]
   }
   ```
-* **Response Payload**: `EvidenceResponse`
 
 ---
 

@@ -1,0 +1,9 @@
+{
+  "provider": "GlobalPay Solutions",
+  "advisory_id": "ADV-2026-10-TLS",
+  "timestamp": "2026-10-25T11:00:00+05:30",
+  "event": "root_ca_rotation",
+  "summary": "Scheduled rotation of legacy intermediate TLS certificates completed. All API clients must trust DigiCert Global Root G2.",
+  "status": "Completed",
+  "reference_url": "https://status.globalpay.com/notices/tls-rotation-october-2026"
+}

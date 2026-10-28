@@ -1,7 +1,7 @@
 {
-  "title": "Payment gateway memory leak and container OOMKilled",
-  "original_text": "The payment gateway pod entered a CrashLoopBackOff state due to an Out-Of-Memory (OOMKilled) condition. A newly introduced in-memory cache lacked TTL expiration, leading to unbounded heap consumption under moderate traffic.",
-  "affected_service": "payment-gateway",
-  "severity": "SEV2",
+  "title": "Payment gateway 502 Bad Gateway spike due to upstream TLS certificate rotation",
+  "original_text": "Checkout transactions began failing with HTTP 502 Bad Gateway. Outbound microservice requests to the external payment processor failed TLS handshakes after the provider updated their root certificate.",
+  "affected_service": "payment-gateway-service",
+  "severity": "SEV1",
   "started_at": "2026-10-25T11:15:00+05:30"
 }

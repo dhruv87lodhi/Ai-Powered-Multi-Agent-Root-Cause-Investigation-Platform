@@ -18,9 +18,9 @@ The actual root-cause analysis and multi-agent investigation will be implemented
 
 The system consists of the following components:
 
-1. **Sample Data:** Contains predefined incident scenarios and their evidence.
-2. **FastAPI Backend:** Exposes APIs to submit incidents and retrieve their status.
-3. **Data Contracts:** Define the standard structure of incidents and evidence.
+1. **Sample Data:** Contains enterprise incident scenarios with realistic multi-source telemetry files (.json, .jsonl, .csv, .log).
+2. **FastAPI Backend:** Exposes APIs to submit incidents, upload telemetry files, and retrieve their status.
+3. **Data Contracts:** Define the standard structure of incidents and evidence, backed by PostgreSQL `JSONB` for raw payloads.
 4. **LangGraph Workflow:** Manages the steps required to prepare an incident for investigation.
 5. **State Persistence:** Stores workflow state so it can be retrieved later.
 6. **Tests:** Verify API behavior, data validation, workflow execution, and state retrieval.
@@ -28,22 +28,21 @@ The system consists of the following components:
 ## 3. Architecture Diagram
 
 ```text
-        Sample Incident Data
-        (incident.json)
-        (evidences.json)
+        Incident & Multi-File Telemetry
+        (incident.json + .json, .jsonl, .csv, .log)
                 |
                 v
-        FastAPI Backend
+        FastAPI Ingestion
                 |
                 v
-        Validate Incident
-        and Evidence
+        Normalize Telemetry
+        & Validate Contracts
                 |
                 v
         LangGraph Workflow
                 |
                 v
-        Prepare Incident State
+        Prepare Investigation State
                 |
                 v
         Persist Workflow State
@@ -61,24 +60,27 @@ Represents the problem that needs investigation.
 Example fields:
 - `incident_id`
 - `title`
-- `description`
-- `severity`
-- `status`
-- `created_at`
+- `original_text`
+- `affected_service`
+- `severity` (`SEV1`–`SEV4`, `UNKNOWN`)
+- `status` (`OPEN`, `INVESTIGATING`, `RESOLVED`, `CLOSED`)
+- `started_at` / `ended_at`
 
 ### Evidence
 
-Represents information that may help explain the incident.
+Represents telemetry artifacts (logs, metrics, traces, pull requests, alerts, chats) linked to an incident.
 
-Example fields:
-- `evidence_id`
-- `incident_id`
-- `source`
-- `content`
-- `timestamp`
-- `source_reference`
-
-The initial evidence sources are Jira, deployment logs, and Slack incident threads.
+Core schema fields:
+- `evidence_id`: UUID
+- `incident_id`: UUID
+- `evidence_type`: `VARCHAR(50)` (e.g., `application_log`, `metric`, `ticket`, `slack_message`)
+- `source_type`: `VARCHAR(30)` (`UPLOAD` | `INTEGRATION`)
+- `source_name`: origin file or system (e.g., `k8s_crashloop.json`, `datadog`)
+- `source_record_id`: external ID (e.g., `HOTFIX-409`, `PR-842`)
+- `event_time`: timestamp
+- `excerpt`: extracted summary or message snippet
+- `content_hash`: SHA-256 hash for deduplication
+- `payload`: PostgreSQL `JSONB` storing all raw and arbitrary fields without schema loss
 
 The exact fields and validation rules are defined in `data-contract.md`.
 
@@ -138,7 +140,10 @@ Sprint 1 tests cover:
 - Saving and retrieving workflow state.
 - Keeping separate investigation runs isolated.
 
-Tests should use predefined sample scenarios, such as a database connection leak.
+Tests verify end-to-end multi-file ingestion across three enterprise scenarios:
+1. **The Bad Config Push** (K8s ConfigMap typo, skipped Jira review, Slack staging/prod confusion)
+2. **Cascading Third-Party Deprecation** (Payment gateway TLS cert rotation, HTTP 502 spike)
+3. **Database Connection Leak** (PR unclosed connection in batch loop, 4-hour memory exhaustion)
 
 ## 9. Scope and Limitations
 

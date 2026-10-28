@@ -1,0 +1,2 @@
+{"timestamp": "2026-10-26T14:02:10+05:30", "reason": "ConnectionPoolExhausted", "message": "QueuePool limit of size 20 overflow 40 reached, connection timed out after 30.00s, unable to acquire DB connection"}
+{"timestamp": "2026-10-26T14:04:32+05:30", "reason": "OOMKilled", "exit_code": 137, "message": "Pod inventory-sync-worker-5d9c7 exceeded container memory limit 4Gi and was terminated by kubelet"}

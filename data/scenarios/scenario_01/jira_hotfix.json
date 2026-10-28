@@ -1,0 +1,13 @@
+{
+  "issue_key": "HOTFIX-409",
+  "event_time": "2026-10-24T09:28:10+05:30",
+  "summary": "Emergency config change to reduce DB idle timeout during high traffic",
+  "issue_type": "Hotfix",
+  "reporter": "alex_oncall@company.com",
+  "assignee": "alex_oncall@company.com",
+  "status": "Deployed",
+  "priority": "Highest",
+  "peer_review_status": "SKIPPED",
+  "bypass_reason": "Emergency production hotfix authorized under on-call fast-track protocol",
+  "reviewers": []
+}

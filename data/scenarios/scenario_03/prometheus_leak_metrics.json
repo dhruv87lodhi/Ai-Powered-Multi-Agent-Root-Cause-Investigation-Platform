@@ -1,0 +1,9 @@
+{
+  "metric_name": "container_memory_working_set_bytes",
+  "service": "inventory-sync-service",
+  "timestamp": "2026-10-26T14:00:00+05:30",
+  "message": "Memory grew linearly from 450MB at 10:00 to 3.95GB (98.8% of container limit) over 4 hours. Active unclosed connections climbed from 10 to 498.",
+  "active_db_connections": 498,
+  "heap_used_bytes": 4241280000,
+  "container_memory_limit_bytes": 4294967296
+}

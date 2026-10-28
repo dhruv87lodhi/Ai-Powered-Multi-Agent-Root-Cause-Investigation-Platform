@@ -1,13 +1,13 @@
 
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
-EvidenceSourceType = Literal["UPLOAD", "BENCHMARK", "INTEGRATION"]
+EvidenceSourceType = Literal["UPLOAD", "INTEGRATION"]
 
 
 class EvidenceCreate(BaseModel):
@@ -42,3 +42,9 @@ class EvidenceResponse(BaseModel):
     content_hash: Optional[str]
     reliability_score: Optional[Decimal]
     payload: Dict[str, Any]
+
+
+class EvidenceBatchResponse(BaseModel):
+    inserted_count: int
+    skipped_count: int
+    items: List[EvidenceResponse]

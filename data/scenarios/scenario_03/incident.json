@@ -1,7 +1,7 @@
 {
-  "title": "Auth service latency spike due to third-party identity provider throttling",
-  "original_text": "Authentication API latency rose from 45ms to 8500ms, causing cascading request timeouts in the frontend gateway. An external OAuth token provider began rate-limiting requests after an upstream outage.",
-  "affected_service": "auth-service",
-  "severity": "SEV1",
-  "started_at": "2026-10-26T14:00:00+05:30"
+  "title": "Gradual memory exhaustion and service crash caused by unclosed DB connection in batch loop",
+  "original_text": "Background inventory sync service suffered progressive memory bloat over 4 hours before collapsing. A recent pull request omitted closing database connections inside a batch ledger processing loop.",
+  "affected_service": "inventory-sync-service",
+  "severity": "SEV2",
+  "started_at": "2026-10-26T10:00:00+05:30"
 }

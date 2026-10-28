@@ -1,0 +1,12 @@
+{
+  "channel": "#devops-oncall",
+  "event_time": "2026-10-24T09:33:20+05:30",
+  "sender": "alex_oncall",
+  "message": "Hey team, order-service pods are throwing CrashLoopBackOff in prod. Wait... did I apply that hotfix ConfigMap to staging-us-east or prod-us-east? Checking my shell history... oh no, my kubectl context was pointing to prod-cluster!",
+  "thread_replies": [
+    {
+      "sender": "sarah_sre",
+      "message": "Roll back the configmap immediately! Prod checkout is failing."
+    }
+  ]
+}

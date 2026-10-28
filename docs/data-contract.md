@@ -24,7 +24,7 @@ For Sprint 1, the platform focuses on:
 ### In Scope (Sprint 1)
 - Relational PostgreSQL schema (`incidents` and `evidence_items` tables).
 - Incident schema with standard SRE severities (`SEV1`–`SEV4`, `UNKNOWN`) and lifecycle statuses (`OPEN`, `INVESTIGATING`, `RESOLVED`, `CLOSED`).
-- Evidence schema supporting multi-modal ingestion (`UPLOAD`, `BENCHMARK`, `INTEGRATION`) with PostgreSQL `JSONB` for raw payloads.
+- Evidence schema supporting multi-modal ingestion (`UPLOAD`, `INTEGRATION`) with PostgreSQL `JSONB` for raw payloads.
 - REST API request and response data contracts (`IncidentCreate`, `IncidentResponse`, `EvidenceCreate`, `EvidenceResponse`).
 - Pure validation service and database check constraint enforcement.
 - LangGraph `InvestigationState` schema and node state transitions (`received` → `validated` → `prepared` → `READY`).
@@ -73,7 +73,7 @@ Stores discrete telemetry artifacts, logs, metrics, or messages linked to an inc
 | `evidence_id` | `UUID` | **No** | Primary Key (`gen_random_uuid()`) | Unique platform identifier for the evidence record. |
 | `incident_id` | `UUID` | **No** | FK → `incidents.incident_id`<br>`ON DELETE RESTRICT` | Parent incident reference. |
 | `evidence_type` | `VARCHAR(50)` | **No** | None | Classification (e.g., `application_log`, `ticket`, `metric`, `slack_message`). |
-| `source_type` | `VARCHAR(30)` | **No** | Check: `IN ('UPLOAD', 'BENCHMARK', 'INTEGRATION')` | Channel through which evidence entered the platform. |
+| `source_type` | `VARCHAR(30)` | **No** | Check: `IN ('UPLOAD', 'INTEGRATION')` | Channel through which evidence entered the platform. |
 | `source_name` | `TEXT` | Yes | `NULL` | External origin system (e.g., `"jira"`, `"datadog"`, `"slack"`). |
 | `source_record_id` | `TEXT` | Yes | `NULL` | External locator ID (e.g., `"JIRA-501"`, `"DEPLOY-204"`). |
 | `event_time` | `TIMESTAMPTZ` | Yes | `NULL` | Timestamp of the event in the original source system. |
@@ -131,8 +131,7 @@ Stores discrete telemetry artifacts, logs, metrics, or messages linked to an inc
 
 ### 5.1 Ingestion Sources (`source_type`)
 
-* `UPLOAD`: File or snippet manually submitted by a human engineer via API or UI.
-* `BENCHMARK`: Curated scenario datasets (e.g., from `data/scenarios/`) used for regression testing.
+* `UPLOAD`: File (`.json`, `.jsonl`, `.csv`, `.txt`) or snippet submitted via API or UI.
 * `INTEGRATION`: Automated webhooks or scheduled pollers from external tools (Jira, Slack, Datadog).
 
 ### 5.2 Evidence JSON Example
@@ -162,7 +161,7 @@ Stores discrete telemetry artifacts, logs, metrics, or messages linked to an inc
     "evidence_id": "8f2a1b9c-4d5e-6f7a-8b9c-0d1e2f3a4b5c",
     "incident_id": "c1f8a847-a8d2-4b2a-89bc-9937bc38d9b1",
     "evidence_type": "application_log",
-    "source_type": "BENCHMARK",
+    "source_type": "UPLOAD",
     "source_name": "kubernetes_deployment",
     "source_record_id": "DEPLOY-204",
     "event_time": "2026-10-24T09:25:00+05:30",
@@ -212,7 +211,7 @@ API models are validated with Pydantic v2 in [backend/app/schemas/](file:///c:/U
 * **`EvidenceCreate`**:
   * `incident_id`: `UUID`
   * `evidence_type`: `str` (1–50 characters)
-  * `source_type`: `EvidenceSourceType` (`"UPLOAD" | "BENCHMARK" | "INTEGRATION"`)
+  * `source_type`: `EvidenceSourceType` (`"UPLOAD" | "INTEGRATION"`)
   * `source_name`: `Optional[str]`
   * `source_record_id`: `Optional[str]`
   * `event_time`: `Optional[datetime]`

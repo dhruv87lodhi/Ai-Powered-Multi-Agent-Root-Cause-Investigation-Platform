@@ -1,6 +1,6 @@
 {
-  "title": "Database connection pool exhausted",
-  "original_text": "The order service started returning HTTP 500 errors because PostgreSQL connection pool reached the maximum configured threshold of 20 connections. Client requests queued and timed out after 30 seconds.",
+  "title": "Order service CrashLoopBackOff following bad ConfigMap deployment",
+  "original_text": "Order service pods entered CrashLoopBackOff after an emergency configuration update. The deployment rolled out to production without prior validation, causing checkout outages.",
   "affected_service": "order-service",
   "severity": "SEV1",
   "started_at": "2026-10-24T09:30:00+05:30"

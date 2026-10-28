@@ -13,6 +13,12 @@ client = TestClient(app)
 
 SCENARIOS_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "scenarios"
 
+BENCHMARK_TITLES = [
+    "Order service CrashLoopBackOff following bad ConfigMap deployment",
+    "Payment gateway 502 Bad Gateway spike due to upstream TLS certificate rotation",
+    "Gradual memory exhaustion and service crash caused by unclosed DB connection in batch loop",
+]
+
 
 @pytest.fixture(autouse=True)
 def cleanup_benchmark_test_data():
@@ -22,15 +28,7 @@ def cleanup_benchmark_test_data():
     try:
         benchmark_incidents = (
             session.query(Incident)
-            .filter(
-                Incident.title.in_(
-                    [
-                        "Database connection pool exhausted",
-                        "Payment gateway memory leak and container OOMKilled",
-                        "Auth service latency spike due to third-party identity provider throttling",
-                    ]
-                )
-            )
+            .filter(Incident.title.in_(BENCHMARK_TITLES))
             .all()
         )
         incident_ids = [inc.incident_id for inc in benchmark_incidents]
@@ -47,14 +45,15 @@ def cleanup_benchmark_test_data():
 
 
 def test_scenario_01_api_ingestion_and_investigation():
-    """Upload scenario_01 via standard REST API and trigger LangGraph preparation."""
+    """Scenario 1 (The Bad Config Push):
+    Upload incident + multiple telemetry files (K8s crashloop, Jira skipped review, Slack on-call confusion).
+    """
     scenario_path = SCENARIOS_DIR / "scenario_01"
 
-    # 1. Load synthetic incident file
+    # 1. Ingest incident metadata
     with open(scenario_path / "incident.json", encoding="utf-8") as f:
         incident_payload = json.load(f)
 
-    # 2. Ingest incident via standard API
     res = client.post("/api/incidents", json=incident_payload)
     assert res.status_code == 201
     created_incident = res.json()
@@ -63,23 +62,45 @@ def test_scenario_01_api_ingestion_and_investigation():
     assert created_incident["severity"] == "SEV1"
     assert created_incident["status"] == "OPEN"
 
-    # 3. Load and ingest all evidence items via standard API
-    with open(scenario_path / "evidences.json", encoding="utf-8") as f:
-        evidences = json.load(f)
+    # 2. Upload multiple distinct evidence files in a single multipart request
+    evidence_files = [
+        f for f in scenario_path.glob("*") if f.name != "incident.json"
+    ]
+    assert len(evidence_files) >= 3
 
-    for item in evidences:
-        ev_res = client.post(f"/api/incidents/{incident_id}/evidence", json=item)
+    multipart_files = []
+    opened_files = []
+    try:
+        for file_path in evidence_files:
+            fp = open(file_path, "rb")
+            opened_files.append(fp)
+            multipart_files.append(("files", (file_path.name, fp, "application/octet-stream")))
+
+        ev_res = client.post(
+            f"/api/incidents/{incident_id}/evidence",
+            files=multipart_files,
+        )
         assert ev_res.status_code == 201
-        evidence_data = ev_res.json()
-        assert evidence_data["incident_id"] == incident_id
-        assert evidence_data["source_type"] == "BENCHMARK"
+        batch_data = ev_res.json()
+        assert batch_data["inserted_count"] == 3
+        assert batch_data["skipped_count"] == 0
+    finally:
+        for fp in opened_files:
+            fp.close()
 
-    # 4. Verify evidence listing API
+    # 3. Verify evidence listing API returns all items
     list_res = client.get(f"/api/incidents/{incident_id}/evidence")
     assert list_res.status_code == 200
-    assert len(list_res.json()) == len(evidences)
+    evidence_items = list_res.json()
+    assert len(evidence_items) == 3
 
-    # 5. Trigger workflow via standard API
+    # Verify source names reflect uploaded files
+    source_names = {item["source_name"] for item in evidence_items}
+    assert "k8s_crashloop.json" in source_names
+    assert "jira_hotfix.json" in source_names
+    assert "slack_oncall.json" in source_names
+
+    # 4. Trigger LangGraph investigation workflow
     inv_res = client.post(f"/api/incidents/{incident_id}/investigate")
     assert inv_res.status_code == 200
     inv_data = inv_res.json()
@@ -89,7 +110,9 @@ def test_scenario_01_api_ingestion_and_investigation():
 
 
 def test_scenario_02_api_ingestion():
-    """Upload scenario_02 (OOMKill) via standard REST API."""
+    """Scenario 2 (Cascading Third-Party Deprecation):
+    Upload incident + Datadog 502 metrics, app TLS error log, third-party status advisory.
+    """
     scenario_path = SCENARIOS_DIR / "scenario_02"
 
     with open(scenario_path / "incident.json", encoding="utf-8") as f:
@@ -99,12 +122,30 @@ def test_scenario_02_api_ingestion():
     assert res.status_code == 201
     incident_id = res.json()["incident_id"]
 
-    with open(scenario_path / "evidences.json", encoding="utf-8") as f:
-        evidences = json.load(f)
+    evidence_files = [
+        f for f in scenario_path.glob("*") if f.name != "incident.json"
+    ]
+    assert len(evidence_files) >= 3
 
-    for item in evidences:
-        ev_res = client.post(f"/api/incidents/{incident_id}/evidence", json=item)
+    multipart_files = []
+    opened_files = []
+    try:
+        for file_path in evidence_files:
+            fp = open(file_path, "rb")
+            opened_files.append(fp)
+            multipart_files.append(("files", (file_path.name, fp, "application/octet-stream")))
+
+        ev_res = client.post(
+            f"/api/incidents/{incident_id}/evidence",
+            files=multipart_files,
+        )
         assert ev_res.status_code == 201
+        batch_data = ev_res.json()
+        # 1 datadog + 2 app log lines + 1 advisory = 4 items
+        assert batch_data["inserted_count"] == 4
+    finally:
+        for fp in opened_files:
+            fp.close()
 
     inv_res = client.post(f"/api/incidents/{incident_id}/investigate")
     assert inv_res.status_code == 200
@@ -112,7 +153,9 @@ def test_scenario_02_api_ingestion():
 
 
 def test_scenario_03_api_ingestion():
-    """Upload scenario_03 (IDP throttling) via standard REST API."""
+    """Scenario 3 (Database Connection Leak):
+    Upload incident + GitHub PR with leak, Prometheus 4-hour leak metrics, K8s OOMKilled events.
+    """
     scenario_path = SCENARIOS_DIR / "scenario_03"
 
     with open(scenario_path / "incident.json", encoding="utf-8") as f:
@@ -122,12 +165,30 @@ def test_scenario_03_api_ingestion():
     assert res.status_code == 201
     incident_id = res.json()["incident_id"]
 
-    with open(scenario_path / "evidences.json", encoding="utf-8") as f:
-        evidences = json.load(f)
+    evidence_files = [
+        f for f in scenario_path.glob("*") if f.name != "incident.json"
+    ]
+    assert len(evidence_files) >= 3
 
-    for item in evidences:
-        ev_res = client.post(f"/api/incidents/{incident_id}/evidence", json=item)
+    multipart_files = []
+    opened_files = []
+    try:
+        for file_path in evidence_files:
+            fp = open(file_path, "rb")
+            opened_files.append(fp)
+            multipart_files.append(("files", (file_path.name, fp, "application/octet-stream")))
+
+        ev_res = client.post(
+            f"/api/incidents/{incident_id}/evidence",
+            files=multipart_files,
+        )
         assert ev_res.status_code == 201
+        batch_data = ev_res.json()
+        # 1 github PR + 1 prometheus + 2 k8s oom jsonl = 4 items
+        assert batch_data["inserted_count"] == 4
+    finally:
+        for fp in opened_files:
+            fp.close()
 
     inv_res = client.post(f"/api/incidents/{incident_id}/investigate")
     assert inv_res.status_code == 200

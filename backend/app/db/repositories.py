@@ -66,6 +66,59 @@ def create_evidence(
     return evidence
 
 
+def create_evidence_batch(
+    db: Session,
+    incident_id: UUID,
+    evidence_items_data: List[EvidenceCreate],
+    deduplicate: bool = True,
+) -> tuple[List[EvidenceItem], int]:
+    """
+    Inserts a batch of evidence items in a single transaction.
+    Optionally deduplicates by content_hash against existing records for the incident.
+    Returns (created_items, skipped_count).
+    """
+    if not evidence_items_data:
+        return [], 0
+
+    existing_hashes = set()
+    if deduplicate:
+        hashes = [
+            item.content_hash
+            for item in evidence_items_data
+            if item.content_hash
+        ]
+        if hashes:
+            stmt = select(EvidenceItem.content_hash).where(
+                EvidenceItem.incident_id == incident_id,
+                EvidenceItem.content_hash.in_(hashes),
+            )
+            existing_hashes = set(db.execute(stmt).scalars().all())
+
+    to_insert: List[EvidenceItem] = []
+    skipped_count = 0
+    seen_in_batch = set()
+
+    for item_data in evidence_items_data:
+        ch = item_data.content_hash
+        if deduplicate and ch:
+            if ch in existing_hashes or ch in seen_in_batch:
+                skipped_count += 1
+                continue
+            seen_in_batch.add(ch)
+
+        dump = item_data.model_dump()
+        dump["incident_id"] = incident_id
+        to_insert.append(EvidenceItem(**dump))
+
+    if to_insert:
+        db.add_all(to_insert)
+        db.commit()
+        for item in to_insert:
+            db.refresh(item)
+
+    return to_insert, skipped_count
+
+
 def get_evidence(
     db: Session,
     evidence_id: UUID,

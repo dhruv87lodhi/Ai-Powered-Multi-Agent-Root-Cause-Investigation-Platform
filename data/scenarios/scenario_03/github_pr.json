@@ -1,0 +1,9 @@
+{
+  "pr_number": 842,
+  "title": "feat: batch process inventory ledger updates",
+  "author": "dev_kevin@company.com",
+  "merged_at": "2026-10-26T09:45:00+05:30",
+  "commit_hash": "e8a931c4f92",
+  "summary": "Merged PR #842: loops over 50,000 ledger records calling engine.connect() without conn.close() or context manager, leaking connection handles.",
+  "changed_files": ["services/ledger_sync.py", "db/connection.py"]
+}

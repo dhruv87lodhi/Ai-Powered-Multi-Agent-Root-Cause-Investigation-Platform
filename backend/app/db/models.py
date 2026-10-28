@@ -97,7 +97,7 @@ class EvidenceItem(Base):
             name="evidence_reliability_check",
         ),
         CheckConstraint(
-            "source_type IN ('UPLOAD', 'BENCHMARK', 'INTEGRATION')",
+            "source_type IN ('UPLOAD', 'INTEGRATION')",
             name="evidence_source_type_check",
         ),
         Index("idx_evidence_incident_event", "incident_id", "event_time"),
