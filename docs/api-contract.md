@@ -128,13 +128,16 @@ This ensures:
 ### 6. Run LangGraph Preparation Workflow
 * **URL**: `POST /api/incidents/{incident_id}/investigate`
 * **Status**: `200 OK`
+* **Notes**: Re-running this endpoint on the same incident reuses the existing `thread_id`, appending a new checkpoint to the same stream rather than starting fresh.
 * **Response Payload**:
   ```json
   {
     "incident_id": "c1f8a847-a8d2-4b2a-89bc-9937bc38d9b1",
-    "status": "READY",
+    "status": "ready",
     "errors": [],
-    "completed_at": "2026-10-24T09:36:00.123456+00:00"
+    "completed_at": "2026-10-24T09:36:00.123456+00:00",
+    "thread_id": "investigation-c1f8a847-a8d2-4b2a-89bc-9937bc38d9b1",
+    "checkpointer_active": true
   }
   ```
 
@@ -142,5 +145,43 @@ This ensures:
 
 ### 7. Get Investigation State
 * **URL**: `GET /api/incidents/{incident_id}/state`
-* **Status**: `200 OK`
-* **Response Payload**: `InvestigationState`
+* **Status**: `200 OK` (or `404 Not Found` if the incident does not exist)
+* **Behaviour**:
+  * If `PostgresSaver` is active and a checkpoint exists for the incident's `thread_id`, the response reflects the **persisted checkpoint state** from PostgreSQL.
+  * If no checkpoint is found yet (workflow has not been triggered), the response falls back to **live database row data** with `state_snapshot: null`.
+  * If the checkpointer is unavailable (DB unreachable at startup), `checkpointer_active` is `false` and live DB data is returned.
+* **Response Payload** (checkpoint found):
+  ```json
+  {
+    "incident_id": "c1f8a847-a8d2-4b2a-89bc-9937bc38d9b1",
+    "thread_id": "investigation-c1f8a847-a8d2-4b2a-89bc-9937bc38d9b1",
+    "status": "ready",
+    "evidence_count": 5,
+    "errors": [],
+    "checkpoint_id": "1f1d2892-48cf-60e0-800a-bda9c1a3aba5",
+    "step": 10,
+    "source": "loop",
+    "checkpointer_active": true,
+    "state_snapshot": {
+      "incident_id": "c1f8a847-a8d2-4b2a-89bc-9937bc38d9b1",
+      "status": "ready",
+      "errors": [],
+      "evidences": ["..."]
+    }
+  }
+  ```
+* **Response Payload** (no checkpoint yet / fallback):
+  ```json
+  {
+    "incident_id": "c1f8a847-a8d2-4b2a-89bc-9937bc38d9b1",
+    "thread_id": "investigation-c1f8a847-a8d2-4b2a-89bc-9937bc38d9b1",
+    "status": "OPEN",
+    "evidence_count": 3,
+    "errors": [],
+    "checkpoint_id": null,
+    "step": null,
+    "source": null,
+    "checkpointer_active": true,
+    "state_snapshot": null
+  }
+  ```

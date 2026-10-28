@@ -277,7 +277,15 @@ class InvestigationState(TypedDict, total=False):
   ```python
   config = {"configurable": {"thread_id": f"investigation-{incident_id}"}}
   ```
-* Sprint 1 uses persistent checkpointing (`PostgresSaver` / `MemorySaver`) to allow retrieving point-in-time state snapshots via `GET /api/incidents/{id}/state`.
+* Sprint 1 uses **`PostgresSaver`** (synchronous, from `langgraph-checkpoint-postgres`) as the production checkpointer. The singleton is initialised in `backend/app/workflow/checkpointer.py` and wired into the FastAPI `lifespan` startup handler.
+* On startup, `PostgresSaver.setup()` is called to idempotently create four LangGraph-managed tables in the same `ai_root_cause` database:
+  * `checkpoints` — one row per graph step per `thread_id` (full state snapshot).
+  * `checkpoint_blobs` — serialized channel values for each snapshot.
+  * `checkpoint_writes` — pending writes buffer before commit.
+  * `checkpoint_migrations` — schema version tracking for the checkpointer.
+* The `thread_id` convention is `investigation-{incident_id}`, so re-running `POST /investigate` on the same incident appends to the same checkpoint stream rather than creating a new one.
+* If the database is unreachable at startup the checkpointer silently stays `None`; all routes fall back to live DB row data without crashing (`checkpointer_active: false` in the response).
+* Checkpoint data is accessible via `GET /api/incidents/{id}/state`, which returns `checkpoint_id`, `step`, `source`, and `state_snapshot` when a persisted checkpoint is found.
 
 ---
 
@@ -288,5 +296,8 @@ class InvestigationState(TypedDict, total=False):
 - [x] Pure incident validation service with timezone and constraint validation in `incident_validator.py`.
 - [x] LangGraph deterministic 4-node pipeline with conditional fail-fast routing in `graph.py` and `nodes.py`.
 - [x] CRUD repository functions with PostgreSQL session management in `repositories.py`.
-- [x] Comprehensive automated test coverage (22 tests passing) across health checks, repositories, graph nodes, and end-to-end graph invocation.
+- [x] Tolerant multi-file evidence ingestion (`.json`, `.jsonl`, `.csv`, `.txt`) with SHA-256 deduplication via `evidence_normalizer.py` and `repositories.create_evidence_batch()`.
+- [x] `PostgresSaver` checkpointer wired into FastAPI lifespan, creating checkpoint tables on startup and persisting state snapshots keyed by `thread_id` per incident.
+- [x] `GET /api/incidents/{id}/state` returns live checkpoint state (`checkpoint_id`, `step`, `source`, `state_snapshot`) with graceful fallback when no checkpoint exists.
+- [x] Comprehensive automated test coverage (**49 tests passing**) across health checks, repositories, graph nodes, multi-file ingestion, 3 enterprise scenario pipelines, and state persistence (unit + mocked integration).
 - [x] Authoritative, aligned Data Contract documentation in `docs/data-contract.md`.

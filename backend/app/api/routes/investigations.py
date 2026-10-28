@@ -7,8 +7,14 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.db import repositories
 from app.workflow.graph import build_investigation_graph
+from app.workflow.checkpointer import get_checkpointer
 
 router = APIRouter(prefix="/incidents", tags=["Investigations"])
+
+# Thread-id convention: one thread per incident UUID so that re-running
+# /investigate on the same incident appends to the same checkpoint stream.
+def _thread_id(incident_id: UUID) -> str:
+    return f"investigation-{incident_id}"
 
 
 @router.post(
@@ -72,11 +78,19 @@ def trigger_investigation(
         "errors": [],
     }
 
-    graph = build_investigation_graph()
+    checkpointer = get_checkpointer()
+    graph = build_investigation_graph(checkpointer=checkpointer)
+
+    thread_id = _thread_id(incident_id)
     result = graph.invoke(
         initial_state,
-        config={"configurable": {"thread_id": f"investigation-{incident_id}"}},
+        config={"configurable": {"thread_id": thread_id}},
     )
+
+    # Attach persistence metadata to the response so callers know where to
+    # retrieve state from.
+    result["thread_id"] = thread_id
+    result["checkpointer_active"] = checkpointer is not None
     return result
 
 
@@ -84,7 +98,7 @@ def trigger_investigation(
     "/{incident_id}/state",
     response_model=Dict[str, Any],
     status_code=status.HTTP_200_OK,
-    summary="Retrieve current investigation state",
+    summary="Retrieve current investigation state from PostgreSQL checkpoint",
 )
 def get_investigation_state(
     incident_id: UUID,
@@ -97,11 +111,54 @@ def get_investigation_state(
             detail=f"Incident '{incident_id}' not found",
         )
 
-    evidences = repositories.list_evidence_for_incident(db, incident_id)
+    thread_id = _thread_id(incident_id)
+    checkpointer = get_checkpointer()
 
+    # ------------------------------------------------------------------
+    # Attempt to load the latest checkpoint snapshot from PostgreSQL.
+    # ------------------------------------------------------------------
+    if checkpointer is not None:
+        try:
+            config = {"configurable": {"thread_id": thread_id}}
+            checkpoint_tuple = checkpointer.get_tuple(config)
+
+            if checkpoint_tuple is not None:
+                saved_state = checkpoint_tuple.checkpoint.get("channel_values", {})
+                metadata = checkpoint_tuple.metadata or {}
+                return {
+                    "incident_id": str(incident.incident_id),
+                    "thread_id": thread_id,
+                    "status": saved_state.get("status", incident.status),
+                    "evidence_count": len(saved_state.get("evidences", [])),
+                    "errors": saved_state.get("errors", []),
+                    "checkpoint_id": checkpoint_tuple.config.get(
+                        "configurable", {}
+                    ).get("checkpoint_id"),
+                    "step": metadata.get("step"),
+                    "source": metadata.get("source"),
+                    "checkpointer_active": True,
+                    "state_snapshot": saved_state,
+                }
+        except Exception as exc:
+            # Log but fall through to the lightweight fallback below.
+            import logging
+            logging.getLogger(__name__).warning(
+                "Could not retrieve checkpoint for thread '%s': %s", thread_id, exc
+            )
+
+    # ------------------------------------------------------------------
+    # Fallback: return live DB row data (no persistent checkpoint found).
+    # ------------------------------------------------------------------
+    evidences = repositories.list_evidence_for_incident(db, incident_id)
     return {
         "incident_id": str(incident.incident_id),
+        "thread_id": thread_id,
         "status": incident.status,
         "evidence_count": len(evidences),
-        "thread_id": f"investigation-{incident_id}",
+        "errors": [],
+        "checkpoint_id": None,
+        "step": None,
+        "source": None,
+        "checkpointer_active": checkpointer is not None,
+        "state_snapshot": None,
     }

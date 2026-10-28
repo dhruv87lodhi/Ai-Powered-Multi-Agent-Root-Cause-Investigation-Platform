@@ -34,7 +34,7 @@ root-cause-platform/
 │   │   ├── services/         # Incident validator & evidence normalizer
 │   │   ├── workflow/         # LangGraph state graph and node definitions
 │   │   └── main.py           # FastAPI application entrypoint
-│   ├── tests/                # Automated pytest suite (29+ unit & scenario tests)
+│   ├── tests/                # Automated pytest suite (49+ unit, integration & scenario tests)
 │   ├── requirements.txt      # Python dependencies
 │   └── .env.example          # Sample environment configuration
 ├── data/
