@@ -1,9 +1,101 @@
-{
-  "metric_name": "http.response.502_bad_gateway_rate",
-  "service": "payment-gateway-service",
-  "timestamp": "2026-10-25T11:17:00+05:30",
-  "value": 89.4,
-  "unit": "percent",
-  "endpoint": "/api/v1/payments/charge",
-  "message": "HTTP 502 Bad Gateway rate surged to 89.4% across 12 pods. Outbound calls to upstream payment gateway timed out or failed SSL negotiation."
-}
+[
+  {
+    "metric_name": "http.response.502_bad_gateway_rate",
+    "service": "payment-gateway-service",
+    "timestamp": "2026-10-25T11:00:00+05:30",
+    "value": 0.08,
+    "unit": "percent",
+    "endpoint": "/api/v1/payments/charge",
+    "message": "Baseline HTTP 502 error rate normal at 0.08%."
+  },
+  {
+    "metric_name": "http.response.502_bad_gateway_rate",
+    "service": "payment-gateway-service",
+    "timestamp": "2026-10-25T11:05:00+05:30",
+    "value": 1.84,
+    "unit": "percent",
+    "endpoint": "/api/v1/payments/charge",
+    "message": "Initial uptick in HTTP 502 Bad Gateway responses following upstream traffic shift."
+  },
+  {
+    "metric_name": "http.response.502_bad_gateway_rate",
+    "service": "payment-gateway-service",
+    "timestamp": "2026-10-25T11:10:00+05:30",
+    "value": 34.20,
+    "unit": "percent",
+    "endpoint": "/api/v1/payments/charge",
+    "message": "HTTP 502 error rate escalates to 34.2% as upstream payment processor routes more traffic through rotated certificates."
+  },
+  {
+    "metric_name": "http.response.502_bad_gateway_rate",
+    "service": "payment-gateway-service",
+    "timestamp": "2026-10-25T11:15:00+05:30",
+    "value": 78.50,
+    "unit": "percent",
+    "endpoint": "/api/v1/payments/charge",
+    "message": "Severe degradation: HTTP 502 Bad Gateway rate crosses high-severity threshold (78.5%)."
+  },
+  {
+    "metric_name": "http.response.502_bad_gateway_rate",
+    "service": "payment-gateway-service",
+    "timestamp": "2026-10-25T11:17:00+05:30",
+    "value": 89.40,
+    "unit": "percent",
+    "endpoint": "/api/v1/payments/charge",
+    "message": "HTTP 502 Bad Gateway rate surged to 89.4% across 12 pods. Outbound calls to upstream payment gateway timed out or failed SSL negotiation."
+  },
+  {
+    "metric_name": "http.client.latency.p99",
+    "service": "payment-gateway-service",
+    "timestamp": "2026-10-25T11:18:00+05:30",
+    "value": 5240.0,
+    "unit": "milliseconds",
+    "endpoint": "/api/v1/payments/charge",
+    "message": "Outbound HTTP client p99 latency spiked from 180ms to 5,240ms due to hanging TLS handshakes and retry exhaustion."
+  },
+  {
+    "metric_name": "ssl.handshake_failures",
+    "service": "payment-gateway-service",
+    "timestamp": "2026-10-25T11:20:00+05:30",
+    "value": 2450.0,
+    "unit": "failures_per_minute",
+    "endpoint": "/api/v1/payments/charge",
+    "message": "TLS negotiation failures surged to 2,450 per minute against host api.globalpay.com."
+  },
+  {
+    "metric_name": "payments.transaction.success_rate",
+    "service": "payment-gateway-service",
+    "timestamp": "2026-10-25T11:25:00+05:30",
+    "value": 10.60,
+    "unit": "percent",
+    "endpoint": "/api/v1/payments/charge",
+    "message": "Card transaction processing success rate plummeted to 10.6%."
+  },
+  {
+    "metric_name": "connection_pool.active_blocked_threads",
+    "service": "payment-gateway-service",
+    "timestamp": "2026-10-25T11:30:00+05:30",
+    "value": 128.0,
+    "unit": "threads",
+    "endpoint": "/api/v1/payments/charge",
+    "message": "Thread pool exhaustion: 128 worker threads blocked awaiting TLS socket verification responses."
+  },
+  {
+    "metric_name": "http.response.502_bad_gateway_rate",
+    "service": "payment-gateway-service",
+    "timestamp": "2026-10-25T11:35:00+05:30",
+    "value": 4.10,
+    "unit": "percent",
+    "endpoint": "/api/v1/payments/charge",
+    "message": "Error rate rapidly falling to 4.1% following rollout of updated ca-certificates truststore bundle."
+  },
+  {
+    "metric_name": "http.response.502_bad_gateway_rate",
+    "service": "payment-gateway-service",
+    "timestamp": "2026-10-25T11:40:00+05:30",
+    "value": 0.05,
+    "unit": "percent",
+    "endpoint": "/api/v1/payments/charge",
+    "message": "Full recovery: HTTP 502 Bad Gateway rate stabilized below 0.05% across all payment gateway pods."
+  }
+]

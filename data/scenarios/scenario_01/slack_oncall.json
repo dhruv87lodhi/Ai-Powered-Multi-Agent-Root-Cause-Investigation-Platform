@@ -1,12 +1,79 @@
-{
-  "channel": "#devops-oncall",
-  "event_time": "2026-10-24T09:33:20+05:30",
-  "sender": "alex_oncall",
-  "message": "Hey team, order-service pods are throwing CrashLoopBackOff in prod. Wait... did I apply that hotfix ConfigMap to staging-us-east or prod-us-east? Checking my shell history... oh no, my kubectl context was pointing to prod-cluster!",
-  "thread_replies": [
-    {
-      "sender": "sarah_sre",
-      "message": "Roll back the configmap immediately! Prod checkout is failing."
-    }
-  ]
-}
+[
+  {
+    "channel": "#devops-oncall",
+    "event_time": "2026-10-24T09:20:15+05:30",
+    "sender": "alex_oncall",
+    "message": "Seeing connection saturation on order DB. Going to bump max idle timeout in staging to see if it stabilizes.",
+    "message_id": "slack_msg_001"
+  },
+  {
+    "channel": "#devops-oncall",
+    "event_time": "2026-10-24T09:27:00+05:30",
+    "sender": "alex_oncall",
+    "message": "Drafted ConfigMap patch with the idle timeout update. Applying now via kubectl.",
+    "message_id": "slack_msg_002"
+  },
+  {
+    "channel": "#devops-oncall",
+    "event_time": "2026-10-24T09:31:05+05:30",
+    "sender": "sre-alert-bot",
+    "message": "CRITICAL: order-service pod crash rate > 50% in production. PagerDuty incident #8821 triggered.",
+    "message_id": "slack_msg_003"
+  },
+  {
+    "channel": "#devops-oncall",
+    "event_time": "2026-10-24T09:32:10+05:30",
+    "sender": "sarah_sre",
+    "message": "Wait, prod checkout is failing with 503s! What was just deployed? Who touched prod?",
+    "message_id": "slack_msg_004"
+  },
+  {
+    "channel": "#devops-oncall",
+    "event_time": "2026-10-24T09:33:20+05:30",
+    "sender": "alex_oncall",
+    "message": "Hey team, order-service pods are throwing CrashLoopBackOff in prod. Wait... did I apply that hotfix ConfigMap to staging-us-east or prod-us-east? Checking my shell history... oh no, my kubectl context was pointing to prod-cluster!",
+    "message_id": "slack_msg_005"
+  },
+  {
+    "channel": "#devops-oncall",
+    "event_time": "2026-10-24T09:34:05+05:30",
+    "sender": "sarah_sre",
+    "message": "Roll back the configmap immediately! Prod checkout is failing completely. Opening war room bridge.",
+    "message_id": "slack_msg_006"
+  },
+  {
+    "channel": "#devops-oncall",
+    "event_time": "2026-10-24T09:35:12+05:30",
+    "sender": "alex_oncall",
+    "message": "Checking pod logs now: seeing 'ConfigurationError: required key DB_MAX_IDLE_TIMEOUT_MS not found in configmap (found: DB_MAX_IDEL_TIMEOUT_MS)'. There is a typo in the key name in the ConfigMap!",
+    "message_id": "slack_msg_007"
+  },
+  {
+    "channel": "#devops-oncall",
+    "event_time": "2026-10-24T09:37:00+05:30",
+    "sender": "incident_commander",
+    "message": "Incident SEV-1 declared. War room active on Meet. Alex is primary remediator, Sarah is SRE lead.",
+    "message_id": "slack_msg_008"
+  },
+  {
+    "channel": "#devops-oncall",
+    "event_time": "2026-10-24T09:39:15+05:30",
+    "sender": "sarah_sre",
+    "message": "Alex, do not edit directly in prod. Re-apply the previous configmap rev 42 from git. I will review your rollback PR.",
+    "message_id": "slack_msg_009"
+  },
+  {
+    "channel": "#devops-oncall",
+    "event_time": "2026-10-24T09:41:40+05:30",
+    "sender": "alex_oncall",
+    "message": "Applied rollback HOTFIX-410 restoring revision 42. Triggering rolling restart of order-service pods.",
+    "message_id": "slack_msg_010"
+  },
+  {
+    "channel": "#devops-oncall",
+    "event_time": "2026-10-24T09:45:00+05:30",
+    "sender": "sre-alert-bot",
+    "message": "RESOLVED: order-service 6/6 pods Running and healthy. Checkout API error rate back to 0.02%.",
+    "message_id": "slack_msg_011"
+  }
+]

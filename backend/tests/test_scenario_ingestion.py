@@ -82,7 +82,7 @@ def test_scenario_01_api_ingestion_and_investigation():
         )
         assert ev_res.status_code == 201
         batch_data = ev_res.json()
-        assert batch_data["inserted_count"] == 3
+        assert batch_data["inserted_count"] >= 30
         assert batch_data["skipped_count"] == 0
     finally:
         for fp in opened_files:
@@ -92,7 +92,7 @@ def test_scenario_01_api_ingestion_and_investigation():
     list_res = client.get(f"/api/incidents/{incident_id}/evidence")
     assert list_res.status_code == 200
     evidence_items = list_res.json()
-    assert len(evidence_items) == 3
+    assert len(evidence_items) >= 30
 
     # Verify source names reflect uploaded files
     source_names = {item["source_name"] for item in evidence_items}
@@ -141,8 +141,8 @@ def test_scenario_02_api_ingestion():
         )
         assert ev_res.status_code == 201
         batch_data = ev_res.json()
-        # 1 datadog + 2 app log lines + 1 advisory = 4 items
-        assert batch_data["inserted_count"] == 4
+        # 11 datadog metrics + 11 app log lines + 10 advisory records >= 30 items
+        assert batch_data["inserted_count"] >= 30
     finally:
         for fp in opened_files:
             fp.close()
@@ -184,8 +184,8 @@ def test_scenario_03_api_ingestion():
         )
         assert ev_res.status_code == 201
         batch_data = ev_res.json()
-        # 1 github PR + 1 prometheus + 2 k8s oom jsonl = 4 items
-        assert batch_data["inserted_count"] == 4
+        # 10 github PR records + 11 prometheus leak samples + 11 k8s oom jsonl events >= 30 items
+        assert batch_data["inserted_count"] >= 30
     finally:
         for fp in opened_files:
             fp.close()

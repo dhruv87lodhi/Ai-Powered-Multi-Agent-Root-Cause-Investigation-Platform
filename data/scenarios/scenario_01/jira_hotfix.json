@@ -1,13 +1,124 @@
-{
-  "issue_key": "HOTFIX-409",
-  "event_time": "2026-10-24T09:28:10+05:30",
-  "summary": "Emergency config change to reduce DB idle timeout during high traffic",
-  "issue_type": "Hotfix",
-  "reporter": "alex_oncall@company.com",
-  "assignee": "alex_oncall@company.com",
-  "status": "Deployed",
-  "priority": "Highest",
-  "peer_review_status": "SKIPPED",
-  "bypass_reason": "Emergency production hotfix authorized under on-call fast-track protocol",
-  "reviewers": []
-}
+[
+  {
+    "issue_key": "HOTFIX-409",
+    "event_time": "2026-10-24T09:28:10+05:30",
+    "summary": "Emergency config change to reduce DB idle timeout during high traffic",
+    "issue_type": "Hotfix",
+    "reporter": "alex_oncall@company.com",
+    "assignee": "alex_oncall@company.com",
+    "status": "Deployed",
+    "priority": "Highest",
+    "peer_review_status": "SKIPPED",
+    "bypass_reason": "Emergency production hotfix authorized under on-call fast-track protocol",
+    "reviewers": []
+  },
+  {
+    "issue_key": "HOTFIX-409",
+    "event_time": "2026-10-24T09:25:00+05:30",
+    "summary": "HOTFIX-409 created in draft state",
+    "issue_type": "Changelog",
+    "reporter": "alex_oncall@company.com",
+    "assignee": "alex_oncall@company.com",
+    "status": "Created",
+    "priority": "Highest",
+    "field_changed": "status",
+    "old_value": null,
+    "new_value": "Draft"
+  },
+  {
+    "issue_key": "HOTFIX-409",
+    "event_time": "2026-10-24T09:26:15+05:30",
+    "summary": "HOTFIX-409 peer review bypass flag set",
+    "issue_type": "AuditRecord",
+    "reporter": "alex_oncall@company.com",
+    "assignee": "alex_oncall@company.com",
+    "status": "In Progress",
+    "priority": "Highest",
+    "field_changed": "peer_review_status",
+    "old_value": "PENDING",
+    "new_value": "SKIPPED"
+  },
+  {
+    "issue_key": "HOTFIX-409",
+    "event_time": "2026-10-24T09:28:45+05:30",
+    "summary": "HOTFIX-409 status transition to Deployed",
+    "issue_type": "Changelog",
+    "reporter": "alex_oncall@company.com",
+    "assignee": "alex_oncall@company.com",
+    "status": "Deployed",
+    "priority": "Highest",
+    "field_changed": "status",
+    "old_value": "In Progress",
+    "new_value": "Deployed"
+  },
+  {
+    "issue_key": "HOTFIX-408",
+    "event_time": "2026-10-24T09:15:00+05:30",
+    "summary": "Investigate morning spike in PostgreSQL idle connection pool utilization",
+    "issue_type": "Task",
+    "reporter": "sarah_sre@company.com",
+    "assignee": "alex_oncall@company.com",
+    "status": "In Progress",
+    "priority": "High",
+    "notes": "Idle connection count spiked above 80%; recommend lowering DB_MAX_IDLE_TIMEOUT_MS in staging first."
+  },
+  {
+    "issue_key": "INC-8821",
+    "event_time": "2026-10-24T09:31:00+05:30",
+    "summary": "Production checkout API 500 error rate surged to 100%",
+    "issue_type": "Incident",
+    "reporter": "datadog_alert_bot@company.com",
+    "assignee": "sarah_sre@company.com",
+    "status": "Investigating",
+    "priority": "Highest",
+    "severity": "SEV1",
+    "linked_hotfix": "HOTFIX-409"
+  },
+  {
+    "issue_key": "INC-8821",
+    "event_time": "2026-10-24T09:33:00+05:30",
+    "summary": "Comment on INC-8821 by sarah_sre",
+    "issue_type": "Comment",
+    "reporter": "sarah_sre@company.com",
+    "assignee": "sarah_sre@company.com",
+    "status": "Investigating",
+    "comment_body": "Outage onset aligns exactly with HOTFIX-409 deployment at 09:28. Pods in CrashLoopBackOff."
+  },
+  {
+    "issue_key": "DEPLOY-1102",
+    "event_time": "2026-10-24T09:29:10+05:30",
+    "summary": "Deployment audit: order-service-config updated directly via kubectl",
+    "issue_type": "DeploymentAudit",
+    "reporter": "k8s_audit_logger@company.com",
+    "target_cluster": "prod-us-east-cluster",
+    "status": "Executed",
+    "changed_resources": ["configmap/order-service-config"],
+    "executor": "alex_oncall"
+  },
+  {
+    "issue_key": "HOTFIX-410",
+    "event_time": "2026-10-24T09:42:00+05:30",
+    "summary": "Rollback order-service-config ConfigMap to revision 42 to fix DB_MAX_IDEL typo",
+    "issue_type": "Hotfix",
+    "reporter": "alex_oncall@company.com",
+    "assignee": "alex_oncall@company.com",
+    "status": "In Progress",
+    "priority": "Highest",
+    "peer_review_status": "APPROVED",
+    "reviewers": ["sarah_sre@company.com"]
+  },
+  {
+    "issue_key": "POSTMORTEM-88",
+    "event_time": "2026-10-24T10:00:00+05:30",
+    "summary": "PIR: Order service crashloop caused by bypassed hotfix peer review and kubectl context confusion",
+    "issue_type": "Postmortem",
+    "reporter": "sarah_sre@company.com",
+    "assignee": "alex_oncall@company.com",
+    "status": "Draft",
+    "action_items": [
+      "Implement admission controller validation for ConfigMap schemas",
+      "Require dual-authorization for kubectl prod context access",
+      "Disable peer-review bypass flag in Jira hotfix workflow"
+    ]
+  }
+]

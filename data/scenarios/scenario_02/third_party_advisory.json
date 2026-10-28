@@ -1,9 +1,92 @@
-{
-  "provider": "GlobalPay Solutions",
-  "advisory_id": "ADV-2026-10-TLS",
-  "timestamp": "2026-10-25T11:00:00+05:30",
-  "event": "root_ca_rotation",
-  "summary": "Scheduled rotation of legacy intermediate TLS certificates completed. All API clients must trust DigiCert Global Root G2.",
-  "status": "Completed",
-  "reference_url": "https://status.globalpay.com/notices/tls-rotation-october-2026"
-}
+[
+  {
+    "provider": "GlobalPay Solutions",
+    "advisory_id": "ADV-2026-09-PRENOTIFY",
+    "timestamp": "2026-09-25T10:00:00+05:30",
+    "event": "advance_security_notice",
+    "summary": "Advance Notice: Upcoming migration of API endpoint TLS certificates to modern DigiCert Global Root G2 hierarchy.",
+    "status": "Published",
+    "reference_url": "https://status.globalpay.com/notices/tls-rotation-advance-notice"
+  },
+  {
+    "provider": "GlobalPay Solutions",
+    "advisory_id": "ADV-2026-10-FINGERPRINT",
+    "timestamp": "2026-10-10T14:30:00+05:30",
+    "event": "certificate_fingerprint_bulletin",
+    "summary": "Technical bulletin: New root certificate SHA-256 fingerprint: CB:3C:CB:B7:60:31:E5:E0:13:8F:8E:D4:B5:12:19:AD:E4:C8:B0:77:5B:11:44:A2:A3:4F:92:02:8A:72:5E:40.",
+    "status": "Published",
+    "reference_url": "https://status.globalpay.com/notices/tls-fingerprints-october-2026"
+  },
+  {
+    "provider": "GlobalPay Solutions",
+    "advisory_id": "ADV-2026-10-SANDBOX",
+    "timestamp": "2026-10-15T09:00:00+05:30",
+    "event": "sandbox_testing_window",
+    "summary": "Staging and sandbox environments updated with new root CA. Developers advised to verify client SDK truststores.",
+    "status": "Completed",
+    "reference_url": "https://status.globalpay.com/notices/sandbox-testing-window"
+  },
+  {
+    "provider": "GlobalPay Solutions",
+    "advisory_id": "ADV-2026-10-REMINDER",
+    "timestamp": "2026-10-18T10:00:00+05:30",
+    "event": "maintenance_reminder",
+    "summary": "Final reminder: Scheduled production TLS root certificate cutover scheduled for October 25, 2026 at 11:00 IST.",
+    "status": "Published",
+    "reference_url": "https://status.globalpay.com/notices/cutover-reminder"
+  },
+  {
+    "provider": "GlobalPay Solutions",
+    "advisory_id": "ADV-2026-10-TLS",
+    "timestamp": "2026-10-25T11:00:00+05:30",
+    "event": "root_ca_rotation",
+    "summary": "Scheduled rotation of legacy intermediate TLS certificates completed. All API clients must trust DigiCert Global Root G2.",
+    "status": "Completed",
+    "reference_url": "https://status.globalpay.com/notices/tls-rotation-october-2026"
+  },
+  {
+    "provider": "GlobalPay Solutions",
+    "advisory_id": "ADV-2026-10-INCIDENT",
+    "timestamp": "2026-10-25T11:18:00+05:30",
+    "event": "upstream_status_investigating",
+    "summary": "Investigating customer reports of TLS handshake failures when connecting to production endpoints from legacy environments.",
+    "status": "Investigating",
+    "reference_url": "https://status.globalpay.com/incidents/legacy-client-handshake-failures"
+  },
+  {
+    "provider": "GlobalPay Solutions",
+    "advisory_id": "ADV-2026-10-GUIDE",
+    "timestamp": "2026-10-25T11:22:00+05:30",
+    "event": "remediation_guidance",
+    "summary": "Remediation guidance: Customers using Docker containers built prior to 2022 must run 'apt-get update && apt-get install --only-upgrade ca-certificates'.",
+    "status": "Published",
+    "reference_url": "https://status.globalpay.com/docs/remediation-ca-certificates"
+  },
+  {
+    "provider": "GlobalPay Solutions",
+    "advisory_id": "TICKET-GP-9921",
+    "timestamp": "2026-10-25T11:24:00+05:30",
+    "event": "customer_support_inquiry",
+    "summary": "Enterprise support ticket opened: Payment gateway client receiving 'unable to get local issuer certificate' on charge API.",
+    "status": "Open",
+    "reference_url": "https://support.globalpay.com/tickets/GP-9921"
+  },
+  {
+    "provider": "GlobalPay Solutions",
+    "advisory_id": "TICKET-GP-9921-RESP",
+    "timestamp": "2026-10-25T11:28:00+05:30",
+    "event": "customer_support_response",
+    "summary": "Support Response: Confirmed api.globalpay.com now serves leaf cert signed by GlobalPay Intermediate CA 2026 rooted in DigiCert Global Root G2.",
+    "status": "Answered",
+    "reference_url": "https://support.globalpay.com/tickets/GP-9921"
+  },
+  {
+    "provider": "GlobalPay Solutions",
+    "advisory_id": "ADV-2026-10-RESOLVED",
+    "timestamp": "2026-10-25T12:00:00+05:30",
+    "event": "maintenance_all_clear",
+    "summary": "All upstream production endpoints fully healthy and operating under new DigiCert G2 certificate infrastructure.",
+    "status": "Resolved",
+    "reference_url": "https://status.globalpay.com/notices/tls-rotation-all-clear"
+  }
+]

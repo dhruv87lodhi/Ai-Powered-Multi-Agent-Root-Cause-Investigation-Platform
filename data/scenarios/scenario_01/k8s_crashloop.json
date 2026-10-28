@@ -1,10 +1,112 @@
-{
-  "event_time": "2026-10-24T09:31:45+05:30",
-  "system": "kubernetes",
-  "pod": "order-service-7d889b94cf-m2q1r",
-  "namespace": "production",
-  "reason": "CrashLoopBackOff",
-  "exit_code": 1,
-  "message": "ConfigurationError: required key 'DB_MAX_IDLE_TIMEOUT_MS' not found in configmap 'order-service-config' (found: 'DB_MAX_IDEL_TIMEOUT_MS'). Process exited with code 1.",
-  "restart_count": 5
-}
+[
+  {
+    "event_time": "2026-10-24T09:30:15+05:30",
+    "system": "kubernetes",
+    "pod": "order-service-7d889b94cf-m2q1r",
+    "namespace": "production",
+    "reason": "ConfigMapMountUpdated",
+    "exit_code": null,
+    "message": "Volume 'config-volume' synced with updated ConfigMap 'order-service-config' revision 43.",
+    "restart_count": 0
+  },
+  {
+    "event_time": "2026-10-24T09:30:42+05:30",
+    "system": "kubernetes",
+    "pod": "order-service-7d889b94cf-m2q1r",
+    "namespace": "production",
+    "reason": "ContainerStarted",
+    "exit_code": null,
+    "message": "Started container 'order-api' with command '/app/entrypoint.sh'.",
+    "restart_count": 0
+  },
+  {
+    "event_time": "2026-10-24T09:30:45+05:30",
+    "system": "kubernetes",
+    "pod": "order-service-7d889b94cf-m2q1r",
+    "namespace": "production",
+    "reason": "Error",
+    "exit_code": 1,
+    "message": "ConfigurationError: required key 'DB_MAX_IDLE_TIMEOUT_MS' not found in configmap 'order-service-config' (found: 'DB_MAX_IDEL_TIMEOUT_MS'). Process exited with code 1.",
+    "restart_count": 1
+  },
+  {
+    "event_time": "2026-10-24T09:30:58+05:30",
+    "system": "kubernetes",
+    "pod": "order-service-7d889b94cf-x9k2p",
+    "namespace": "production",
+    "reason": "ContainerStarted",
+    "exit_code": null,
+    "message": "Started container 'order-api' on node gke-prod-pool-2.",
+    "restart_count": 0
+  },
+  {
+    "event_time": "2026-10-24T09:31:01+05:30",
+    "system": "kubernetes",
+    "pod": "order-service-7d889b94cf-x9k2p",
+    "namespace": "production",
+    "reason": "Error",
+    "exit_code": 1,
+    "message": "ConfigurationError: required key 'DB_MAX_IDLE_TIMEOUT_MS' not found in configmap 'order-service-config' (found: 'DB_MAX_IDEL_TIMEOUT_MS'). Process exited with code 1.",
+    "restart_count": 1
+  },
+  {
+    "event_time": "2026-10-24T09:31:15+05:30",
+    "system": "kubernetes",
+    "pod": "order-service-7d889b94cf-4j8lw",
+    "namespace": "production",
+    "reason": "Error",
+    "exit_code": 1,
+    "message": "ConfigurationError: required key 'DB_MAX_IDLE_TIMEOUT_MS' not found in configmap 'order-service-config' (found: 'DB_MAX_IDEL_TIMEOUT_MS'). Process exited with code 1.",
+    "restart_count": 1
+  },
+  {
+    "event_time": "2026-10-24T09:31:30+05:30",
+    "system": "kubernetes",
+    "pod": "order-service-7d889b94cf-m2q1r",
+    "namespace": "production",
+    "reason": "BackOff",
+    "exit_code": null,
+    "message": "Back-off 10s restarting failed container 'order-api' in pod 'order-service-7d889b94cf-m2q1r_production'.",
+    "restart_count": 2
+  },
+  {
+    "event_time": "2026-10-24T09:31:45+05:30",
+    "system": "kubernetes",
+    "pod": "order-service-7d889b94cf-m2q1r",
+    "namespace": "production",
+    "reason": "CrashLoopBackOff",
+    "exit_code": 1,
+    "message": "ConfigurationError: required key 'DB_MAX_IDLE_TIMEOUT_MS' not found in configmap 'order-service-config' (found: 'DB_MAX_IDEL_TIMEOUT_MS'). Process exited with code 1.",
+    "restart_count": 5
+  },
+  {
+    "event_time": "2026-10-24T09:32:00+05:30",
+    "system": "kubernetes",
+    "pod": "order-service-7d889b94cf-x9k2p",
+    "namespace": "production",
+    "reason": "CrashLoopBackOff",
+    "exit_code": 1,
+    "message": "Back-off 40s restarting failed container 'order-api' pod in CrashLoopBackOff.",
+    "restart_count": 4
+  },
+  {
+    "event_time": "2026-10-24T09:32:15+05:30",
+    "system": "kubernetes",
+    "pod": "order-service-7d889b94cf-4j8lw",
+    "namespace": "production",
+    "reason": "Unhealthy",
+    "exit_code": null,
+    "message": "Readiness probe failed: HTTP probe failed with statuscode: 503 connection refused.",
+    "restart_count": 3
+  },
+  {
+    "event_time": "2026-10-24T09:32:30+05:30",
+    "system": "kubernetes",
+    "pod": "order-service-deployment",
+    "namespace": "production",
+    "reason": "DeploymentDegraded",
+    "exit_code": null,
+    "message": "Deployment has 0 available replicas (desired: 6). Ingress controller removed all pods from backend endpoint pool.",
+    "restart_count": 0
+  }
+]

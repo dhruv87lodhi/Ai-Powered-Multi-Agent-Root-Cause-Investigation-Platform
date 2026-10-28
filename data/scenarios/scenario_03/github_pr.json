@@ -1,9 +1,92 @@
-{
-  "pr_number": 842,
-  "title": "feat: batch process inventory ledger updates",
-  "author": "dev_kevin@company.com",
-  "merged_at": "2026-10-26T09:45:00+05:30",
-  "commit_hash": "e8a931c4f92",
-  "summary": "Merged PR #842: loops over 50,000 ledger records calling engine.connect() without conn.close() or context manager, leaking connection handles.",
-  "changed_files": ["services/ledger_sync.py", "db/connection.py"]
-}
+[
+  {
+    "pr_number": 842,
+    "title": "feat: batch process inventory ledger updates",
+    "author": "dev_kevin@company.com",
+    "merged_at": "2026-10-26T09:45:00+05:30",
+    "commit_hash": "e8a931c4f92",
+    "summary": "Merged PR #842: loops over 50,000 ledger records calling engine.connect() without conn.close() or context manager, leaking connection handles.",
+    "changed_files": ["services/ledger_sync.py", "db/connection.py"],
+    "event_type": "pull_request_merged"
+  },
+  {
+    "pr_number": 842,
+    "commit_hash": "b1c4021a8d0",
+    "author": "dev_kevin@company.com",
+    "event_time": "2026-10-26T08:30:00+05:30",
+    "title": "Commit b1c4021: Initial structure of ledger batch synchronization worker",
+    "summary": "Added batch queue listener and task partitioner for inventory sync service.",
+    "changed_files": ["services/ledger_sync.py"],
+    "event_type": "commit"
+  },
+  {
+    "pr_number": 842,
+    "commit_hash": "e8a931c4f92",
+    "author": "dev_kevin@company.com",
+    "event_time": "2026-10-26T09:15:00+05:30",
+    "title": "Commit e8a931c: Refactor ledger audit logging to execute per-record database writes",
+    "summary": "Introduced engine.connect() helper within loop without conn.close(), causing file descriptor and memory handle leaks.",
+    "changed_files": ["db/connection.py", "services/ledger_sync.py"],
+    "event_type": "commit"
+  },
+  {
+    "pr_number": 842,
+    "author": "code_reviewer_dan@company.com",
+    "event_time": "2026-10-26T09:30:00+05:30",
+    "title": "Code Review Comment on services/ledger_sync.py:142",
+    "summary": "Review approval comment: 'Logic looks clean, 50,000 batch size is well partitioned for background processing. Approved.'",
+    "review_status": "APPROVED",
+    "event_type": "pull_request_review"
+  },
+  {
+    "pr_number": 842,
+    "author": "dev_kevin@company.com",
+    "event_time": "2026-10-26T09:35:00+05:30",
+    "title": "Diff Inspection: db/connection.py:58",
+    "summary": "Code diff snippet:\n+ def log_ledger_audit_entry(entry):\n+     conn = engine.connect()\n+     conn.execute(text('INSERT INTO ledger_audit ...'), entry.to_dict())\n+     # NOTE: Missing conn.close() or context manager 'with engine.connect() as conn:'",
+    "event_type": "code_diff"
+  },
+  {
+    "pr_number": 842,
+    "workflow_id": "gh-actions-run-1892",
+    "event_time": "2026-10-26T09:40:00+05:30",
+    "title": "GitHub Actions CI Run #1892: All tests passed",
+    "summary": "Unit test suite completed with 148 passed tests in 45s. Unit tests utilized MagicMock for engine.connect(), masking live connection leak.",
+    "ci_status": "SUCCESS",
+    "event_type": "ci_pipeline"
+  },
+  {
+    "release_tag": "v2.14.0",
+    "commit_hash": "e8a931c4f92",
+    "event_time": "2026-10-26T09:50:00+05:30",
+    "title": "Release v2.14.0 tagged and container build published",
+    "summary": "Docker image inventory-sync-service:v2.14.0 built and pushed to ECR registry.",
+    "event_type": "release"
+  },
+  {
+    "deployment_id": "deploy-k8s-prod-994",
+    "event_time": "2026-10-26T09:55:00+05:30",
+    "title": "Kubernetes Deployment rollout of inventory-sync-service v2.14.0",
+    "summary": "Deployment updated to image inventory-sync-service:v2.14.0 with resource limit 4Gi memory.",
+    "event_type": "deployment"
+  },
+  {
+    "pr_number": 843,
+    "title": "fix: wrap ledger audit engine.connect in context manager and set connection pool recycle",
+    "author": "sarah_sre@company.com",
+    "event_time": "2026-10-26T14:20:00+05:30",
+    "commit_hash": "a4d912e77b1",
+    "summary": "Emergency fix: replaces raw engine.connect() with 'with engine.connect() as conn:' to ensure connection release back to QueuePool.",
+    "changed_files": ["db/connection.py"],
+    "event_type": "pull_request_fix"
+  },
+  {
+    "pr_number": 843,
+    "author": "dev_kevin@company.com",
+    "event_time": "2026-10-26T14:30:00+05:30",
+    "title": "Code Review Approval on PR #843 by dev_kevin",
+    "summary": "Verified connection pool handles release properly in local benchmark; memory remains constant at 420MB over 100,000 iterations.",
+    "review_status": "APPROVED",
+    "event_type": "pull_request_review"
+  }
+]

@@ -1,9 +1,101 @@
-{
-  "metric_name": "container_memory_working_set_bytes",
-  "service": "inventory-sync-service",
-  "timestamp": "2026-10-26T14:00:00+05:30",
-  "message": "Memory grew linearly from 450MB at 10:00 to 3.95GB (98.8% of container limit) over 4 hours. Active unclosed connections climbed from 10 to 498.",
-  "active_db_connections": 498,
-  "heap_used_bytes": 4241280000,
-  "container_memory_limit_bytes": 4294967296
-}
+[
+  {
+    "metric_name": "container_memory_working_set_bytes",
+    "service": "inventory-sync-service",
+    "timestamp": "2026-10-26T10:00:00+05:30",
+    "message": "Baseline memory consumption following batch ledger worker startup.",
+    "active_db_connections": 10,
+    "heap_used_bytes": 471859200,
+    "container_memory_limit_bytes": 4294967296
+  },
+  {
+    "metric_name": "container_memory_working_set_bytes",
+    "service": "inventory-sync-service",
+    "timestamp": "2026-10-26T10:30:00+05:30",
+    "message": "Memory increased by 370MB after processing 6,500 ledger records.",
+    "active_db_connections": 68,
+    "heap_used_bytes": 859832320,
+    "container_memory_limit_bytes": 4294967296
+  },
+  {
+    "metric_name": "container_memory_working_set_bytes",
+    "service": "inventory-sync-service",
+    "timestamp": "2026-10-26T11:00:00+05:30",
+    "message": "Memory increased to 1.28GB; unclosed connection handles continue to accumulate.",
+    "active_db_connections": 124,
+    "heap_used_bytes": 1374389534,
+    "container_memory_limit_bytes": 4294967296
+  },
+  {
+    "metric_name": "container_memory_working_set_bytes",
+    "service": "inventory-sync-service",
+    "timestamp": "2026-10-26T11:30:00+05:30",
+    "message": "Linear memory climb sustained; garbage collection unable to reclaim unclosed SQLAlchemy connection objects.",
+    "active_db_connections": 185,
+    "heap_used_bytes": 1835008000,
+    "container_memory_limit_bytes": 4294967296
+  },
+  {
+    "metric_name": "container_memory_working_set_bytes",
+    "service": "inventory-sync-service",
+    "timestamp": "2026-10-26T12:00:00+05:30",
+    "message": "Memory reached 2.21GB (51.4% of container limit); active unclosed connections reached 245.",
+    "active_db_connections": 245,
+    "heap_used_bytes": 2365587456,
+    "container_memory_limit_bytes": 4294967296
+  },
+  {
+    "metric_name": "container_memory_working_set_bytes",
+    "service": "inventory-sync-service",
+    "timestamp": "2026-10-26T12:30:00+05:30",
+    "message": "Memory reached 2.74GB; PostgreSQL pg_stat_activity reports 310 open idle-in-transaction connections from worker IP.",
+    "active_db_connections": 310,
+    "heap_used_bytes": 2942009344,
+    "container_memory_limit_bytes": 4294967296
+  },
+  {
+    "metric_name": "container_memory_working_set_bytes",
+    "service": "inventory-sync-service",
+    "timestamp": "2026-10-26T13:00:00+05:30",
+    "message": "Memory reached 3.25GB (75.6% of container limit); worker throughput degrades due to page faults.",
+    "active_db_connections": 375,
+    "heap_used_bytes": 3489660928,
+    "container_memory_limit_bytes": 4294967296
+  },
+  {
+    "metric_name": "container_memory_working_set_bytes",
+    "service": "inventory-sync-service",
+    "timestamp": "2026-10-26T13:30:00+05:30",
+    "message": "Memory reached 3.72GB; major GC cycles pausing Python worker for up to 4.2 seconds.",
+    "active_db_connections": 438,
+    "heap_used_bytes": 3994484736,
+    "container_memory_limit_bytes": 4294967296
+  },
+  {
+    "metric_name": "container_memory_working_set_bytes",
+    "service": "inventory-sync-service",
+    "timestamp": "2026-10-26T14:00:00+05:30",
+    "message": "Memory grew linearly from 450MB at 10:00 to 3.95GB (98.8% of container limit) over 4 hours. Active unclosed connections climbed from 10 to 498.",
+    "active_db_connections": 498,
+    "heap_used_bytes": 4241280000,
+    "container_memory_limit_bytes": 4294967296
+  },
+  {
+    "metric_name": "container_memory_working_set_bytes",
+    "service": "inventory-sync-service",
+    "timestamp": "2026-10-26T14:04:45+05:30",
+    "message": "Pod memory collapses to 0 bytes following Kubelet SIGKILL (exit code 137).",
+    "active_db_connections": 0,
+    "heap_used_bytes": 0,
+    "container_memory_limit_bytes": 4294967296
+  },
+  {
+    "metric_name": "container_memory_working_set_bytes",
+    "service": "inventory-sync-service",
+    "timestamp": "2026-10-26T14:06:00+05:30",
+    "message": "Replacement pod memory working set initialized at baseline 435MB.",
+    "active_db_connections": 8,
+    "heap_used_bytes": 456130560,
+    "container_memory_limit_bytes": 4294967296
+  }
+]
