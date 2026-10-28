@@ -162,8 +162,26 @@ class TestGraphWithCheckpointer:
 @pytest.fixture(scope="module")
 def client():
     from app.main import app
+    from app.db.database import SessionLocal
+    from app.db.models import Incident, EvidenceItem
+
     with TestClient(app, raise_server_exceptions=True) as c:
         yield c
+
+    session = SessionLocal()
+    try:
+        subquery = session.query(Incident.incident_id).filter(
+            Incident.title == "State Persistence Test Incident"
+        )
+        session.query(EvidenceItem).filter(
+            EvidenceItem.incident_id.in_(subquery)
+        ).delete(synchronize_session=False)
+        session.query(Incident).filter(
+            Incident.title == "State Persistence Test Incident"
+        ).delete(synchronize_session=False)
+        session.commit()
+    finally:
+        session.close()
 
 
 def _create_incident(client) -> str:

@@ -1,4 +1,4 @@
-# testing first node recive incident
+# testing first node receive incident
 
 from app.workflow.nodes import receive_incident
 
@@ -70,10 +70,10 @@ def test_receive_incident_with_missing_data():
     assert result["errors"] == ["Incident data is missing or invalid !"]
 
 
-# tetsing 2nd node validate incident
+# testing 2nd node validate incident
 from app.workflow.nodes import receive_incident,validate_incident
 
-# tetsing with complete data
+# testing with complete data
 def test_validate_incident_with_valid_data():
     state = {
         "incident": {

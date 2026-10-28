@@ -3,19 +3,30 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+import logging
+
 from app.core.config import settings
+from app.db.database import Base, engine
+import app.db.models  # noqa: F401 – ensure models are registered with Base.metadata
 from app.workflow.checkpointer import setup_checkpointer, teardown_checkpointer
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """FastAPI lifespan handler.
 
-    Startup  → initialise the LangGraph PostgresSaver checkpointer so that
-               checkpoint tables exist and the connection is ready before the
-               first request arrives.
+    Startup  → create application tables (incidents, evidence_items) and
+               initialise the LangGraph PostgresSaver checkpointer.
     Shutdown → close the long-lived psycopg3 connection gracefully.
     """
+    try:
+        Base.metadata.create_all(bind=engine)
+        logger.info("Application relational tables created / verified successfully.")
+    except Exception as exc:
+        logger.warning("Could not auto-create tables: %s", exc)
+
     setup_checkpointer()
     yield
     teardown_checkpointer()

@@ -1,4 +1,4 @@
-# NODE 1 recieve_incident
+# NODE 1 receive_incident
 
 def receive_incident (state:dict)-> dict:
     incident=state.get("incident")
@@ -53,7 +53,7 @@ def validate_incident(state:dict)->dict:
             "errors" : errors
         }
 
-    # if validate succeds preserve the current state
+    # if validation succeeds preserve the current state
 
     return{
         "incident_id" : incident["incident_id"],
@@ -88,7 +88,7 @@ def prepare_investigation(state: dict)-> dict:
             "errors":["cannot prepare investigation: incident data is missing or invalid"]
         }
 
-    # ensure the incident ID exist
+    # ensure the incident ID exists
     incident_id=state.get("incident_id")
     if not isinstance(incident_id , str) or not incident_id.strip():
         return{

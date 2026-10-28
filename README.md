@@ -75,15 +75,22 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-### 3. Run the Development Server
+### 3. Load Benchmark Telemetry into PostgreSQL (Seeding)
+
+```bash
+# Ingest all 3 enterprise benchmark scenarios and initialize checkpoints
+python -m scripts.seed_database
+```
+
+### 4. Run the Development Server
 
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-Once running, [http://127.0.0.1:8000](http://127.0.0.1:8000).
+Once running, interactive API docs are available at [http://127.0.0.1:8000/api/docs](http://127.0.0.1:8000/api/docs).
 
-### 4. Run Tests
+### 5. Run Tests
 
 ```bash
 pytest

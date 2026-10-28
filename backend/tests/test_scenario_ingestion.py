@@ -13,35 +13,26 @@ client = TestClient(app)
 
 SCENARIOS_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "scenarios"
 
-BENCHMARK_TITLES = [
-    "Order service CrashLoopBackOff following bad ConfigMap deployment",
-    "Payment gateway 502 Bad Gateway spike due to upstream TLS certificate rotation",
-    "Gradual memory exhaustion and service crash caused by unclosed DB connection in batch loop",
-]
+_created_test_incident_ids: list[str] = []
 
 
 @pytest.fixture(autouse=True)
 def cleanup_benchmark_test_data():
-    """Ensure benchmark test records are cleaned up after each test."""
+    """Ensure benchmark test records created during each test run are cleaned up."""
+    _created_test_incident_ids.clear()
     yield
-    session = SessionLocal()
-    try:
-        benchmark_incidents = (
-            session.query(Incident)
-            .filter(Incident.title.in_(BENCHMARK_TITLES))
-            .all()
-        )
-        incident_ids = [inc.incident_id for inc in benchmark_incidents]
-        if incident_ids:
+    if _created_test_incident_ids:
+        session = SessionLocal()
+        try:
             session.query(EvidenceItem).filter(
-                EvidenceItem.incident_id.in_(incident_ids)
+                EvidenceItem.incident_id.in_(_created_test_incident_ids)
             ).delete(synchronize_session=False)
             session.query(Incident).filter(
-                Incident.incident_id.in_(incident_ids)
+                Incident.incident_id.in_(_created_test_incident_ids)
             ).delete(synchronize_session=False)
             session.commit()
-    finally:
-        session.close()
+        finally:
+            session.close()
 
 
 def test_scenario_01_api_ingestion_and_investigation():
@@ -58,6 +49,7 @@ def test_scenario_01_api_ingestion_and_investigation():
     assert res.status_code == 201
     created_incident = res.json()
     incident_id = created_incident["incident_id"]
+    _created_test_incident_ids.append(incident_id)
     assert UUID(incident_id)
     assert created_incident["severity"] == "SEV1"
     assert created_incident["status"] == "OPEN"
@@ -121,6 +113,7 @@ def test_scenario_02_api_ingestion():
     res = client.post("/api/incidents", json=incident_payload)
     assert res.status_code == 201
     incident_id = res.json()["incident_id"]
+    _created_test_incident_ids.append(incident_id)
 
     evidence_files = [
         f for f in scenario_path.glob("*") if f.name != "incident.json"
@@ -164,6 +157,7 @@ def test_scenario_03_api_ingestion():
     res = client.post("/api/incidents", json=incident_payload)
     assert res.status_code == 201
     incident_id = res.json()["incident_id"]
+    _created_test_incident_ids.append(incident_id)
 
     evidence_files = [
         f for f in scenario_path.glob("*") if f.name != "incident.json"
